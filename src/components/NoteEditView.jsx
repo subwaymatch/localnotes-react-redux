@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import styled from "styled-components";
 import Button from "./Button";
 
-import { updateNote, deleteNote } from "../actions";
+import { updateNote, deleteNote, setCurrentNote } from "../actions";
 
 const StyledNoteEditView = styled.div`
   flex-grow: 1
@@ -28,10 +28,20 @@ const NoteTitleInput = styled.input`
 `;
 
 const DateDisplay = styled.p`
-  color: #777;
-  font-size: 14px;
+  color: #aaa;
+  font-size: 15px;
   line-height: 1.6;
   margin-top: 10px;
+
+  .icon {
+    display: inline-block;
+    margin-right: 7px;
+  }
+`;
+
+const DateSeparator = styled.span`
+  display: inline-block;
+  margin: 0 10px;
 `;
 
 const NoteTextInput = styled.textarea`
@@ -59,6 +69,7 @@ class NoteEditView extends Component {
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleTextChange = this.handleTextChange.bind(this);
+    this.handleDeleteNote = this.handleDeleteNote.bind(this);
     this.handleSave = this.handleSave.bind(this);
   }
 
@@ -119,8 +130,15 @@ class NoteEditView extends Component {
     }
   }
 
+  handleDeleteNote(e) {
+    const { note, dispatchDeleteNote, dispatchSetCurrentNote } = this.props;
+
+    dispatchSetCurrentNote(null);
+    dispatchDeleteNote(note.id);
+  }
+
   formatDate(d) {
-    return d.toLocaleString();
+    return new Date(d).toLocaleString();
   }
 
   render() {
@@ -136,16 +154,24 @@ class NoteEditView extends Component {
           type="text"
           value={this.state.title}
           onChange={this.handleTitleChange}
-          placeholder="Test next"
+          placeholder="(Empty Title)"
         />
         <DateDisplay>
-          Created {this.formatDate(note.createdAt)} | Modified{" "}
+          <i className="icon ion-ios-calendar" />
+          Created {this.formatDate(note.createdAt)}
+          <DateSeparator>&#183;</DateSeparator>
+          <i className="icon ion-ios-calendar" /> Last Modified{" "}
           {this.formatDate(note.modifiedAt)}
+          <DateSeparator>&#183;</DateSeparator>
+          <span onClick={this.handleDeleteNote}>
+            <i className="icon ion-md-close" /> Delete
+          </span>
         </DateDisplay>
+
         <NoteTextInput
           value={this.state.text}
           onChange={this.handleTextChange}
-          placeholder="Note text"
+          placeholder="(Empty Note)"
         />
         <Button
           iconClassName="ion-md-save"
@@ -162,7 +188,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  dispatchUpdateNote: (id, title, text) => dispatch(updateNote(id, title, text))
+  dispatchUpdateNote: (id, title, text) =>
+    dispatch(updateNote(id, title, text)),
+  dispatchSetCurrentNote: note => dispatch(setCurrentNote(note)),
+  dispatchDeleteNote: id => dispatch(deleteNote(id))
 });
 
 export default connect(

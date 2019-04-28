@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import styled from "styled-components";
 
 const Title = styled.h3`
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
   margin-bottom: 8px;
 
@@ -10,14 +10,14 @@ const Title = styled.h3`
 `;
 
 const Snippet = styled.p`
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
 
   color: ${props => (props.isActive ? "#aaa" : "#ddd")};
 `;
 
 const StyledNoteListItem = styled.div`
-  padding: 10px 0;
+  padding: 10px 0 15px 0;
   border-bottom: 1px solid #eee;
   cursor: pointer;
 

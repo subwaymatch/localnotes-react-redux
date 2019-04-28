@@ -10,11 +10,20 @@ const StyledNoteList = styled.div`
 `;
 
 class NoteList extends Component {
+  sortNotes() {
+    const { notes } = this.props;
+
+    notes.sort((a, b) => b.modifiedAt - a.modifiedAt);
+  }
+
   render() {
-    const { notes, currentNote, dispatchNewCurrentNote } = this.props;
+    const { currentNote, dispatchNewCurrentNote } = this.props;
+
+    this.sortNotes();
+
     return (
       <StyledNoteList>
-        {notes.map((note, idx) => {
+        {this.props.notes.map((note, idx) => {
           return (
             <NoteListItem
               key={idx}

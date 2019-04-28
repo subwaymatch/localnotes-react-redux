@@ -7,7 +7,7 @@ import Button from "./Button";
 import NoteList from "./NoteList";
 
 const StyledSidebar = styled.div`
-  width: 250px;
+  width: 275px;
   padding: 20px;
   height: 100%;
   overflow-x: hidden;

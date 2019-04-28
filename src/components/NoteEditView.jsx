@@ -1,9 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
+
 import Button from "./Button";
+import NoSelectedNoteView from "./NoSelectedNoteView";
 
 import { updateNote, deleteNote, setCurrentNote } from "../actions";
+
+const Mousetrap = require("mousetrap");
 
 const StyledNoteEditView = styled.div`
   flex-grow: 1
@@ -25,21 +29,28 @@ const NoteTitleInput = styled.input`
   line-height: 1.6;
   font-weight: 300;
   color: #097cff;
+  margin-bottom: 10px;
 `;
 
-const DateDisplay = styled.p`
-  color: #aaa;
+const InlineMenuItem = styled.span`
+  display: inline-block;
+  color: #bbb;
   font-size: 15px;
   line-height: 1.6;
-  margin-top: 10px;
 
   .icon {
     display: inline-block;
     margin-right: 7px;
   }
+
+  &.delete-button {
+    color: #ff0955;
+    cursor: pointer;
+  }
 `;
 
-const DateSeparator = styled.span`
+const Separator = styled.span`
+  color: #bbb;
   display: inline-block;
   margin: 0 10px;
 `;
@@ -64,7 +75,8 @@ class NoteEditView extends Component {
       id: "",
       title: "",
       text: "",
-      modifiedAt: 0
+      modifiedAt: 0,
+      hasChangedSinceSave: false
     };
 
     this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -73,19 +85,13 @@ class NoteEditView extends Component {
     this.handleSave = this.handleSave.bind(this);
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    console.log("shouldComponentUpdate");
-
-    return true;
-  }
-
   static getDerivedStateFromProps(props, state) {
     let returnVal = null;
 
     if (props.note === null) {
       return null;
     } else if (props.note.id !== state.id) {
-      returnVal = Object.assign({}, props.note);
+      returnVal = Object.assign({}, props.note, { hasChangedSinceSave: false });
     } else if (
       props.note.title !== state.title ||
       props.note.text !== state.text ||
@@ -100,16 +106,41 @@ class NoteEditView extends Component {
     return returnVal;
   }
 
+  componentDidMount() {
+    const _this = this;
+
+    Mousetrap.bind(["ctrl+s", "command+s"], function(e) {
+      e.preventDefault();
+
+      _this.handleSave();
+    });
+  }
+
+  componentWillUnmount() {
+    Mousetrap.unbind(["ctrl+s", "command+s"]);
+  }
+
   handleTitleChange(e) {
-    e.preventDefault();
+    const newTitle = e.target.value;
+    const { note } = this.props;
+
     this.setState({
-      title: e.target.value
+      title: newTitle,
+      hasChangedSinceSave: this.hasChangedSinceSave
+        ? this.hasChangedSinceSave
+        : newTitle !== note.title || this.state.text !== note.text
     });
   }
 
   handleTextChange(e) {
+    const newText = e.target.value;
+    const { note } = this.props;
+
     this.setState({
-      text: e.target.value
+      text: newText,
+      hasChangedSinceSave: this.hasChangedSinceSave
+        ? this.hasChangedSinceSave
+        : this.state.title !== note.title || newText !== note.text
     });
   }
 
@@ -125,6 +156,10 @@ class NoteEditView extends Component {
         this.state.title,
         this.state.text
       );
+
+      this.setState({
+        hasChangedSinceSave: false
+      });
 
       this.forceUpdate();
     }
@@ -145,7 +180,7 @@ class NoteEditView extends Component {
     const { note } = this.props;
 
     if (!note) {
-      return <div>No note selected</div>;
+      return <NoSelectedNoteView />;
     }
 
     return (
@@ -155,29 +190,44 @@ class NoteEditView extends Component {
           value={this.state.title}
           onChange={this.handleTitleChange}
           placeholder="(Empty Title)"
+          className="mousetrap"
         />
-        <DateDisplay>
-          <i className="icon ion-ios-calendar" />
-          Created {this.formatDate(note.createdAt)}
-          <DateSeparator>&#183;</DateSeparator>
-          <i className="icon ion-ios-calendar" /> Last Modified{" "}
-          {this.formatDate(note.modifiedAt)}
-          <DateSeparator>&#183;</DateSeparator>
-          <span onClick={this.handleDeleteNote}>
-            <i className="icon ion-md-close" /> Delete
-          </span>
-        </DateDisplay>
+
+        <div>
+          <InlineMenuItem className="delete-button">
+            <span onClick={this.handleDeleteNote}>
+              <i className="icon ion-md-close" /> Delete
+            </span>
+          </InlineMenuItem>
+
+          <Separator>&#183;</Separator>
+
+          <InlineMenuItem>
+            <i className="icon ion-ios-calendar" />
+            Created {this.formatDate(note.createdAt)}
+          </InlineMenuItem>
+
+          <Separator>&#183;</Separator>
+
+          <InlineMenuItem>
+            <i className="icon ion-ios-calendar" /> Last Modified{" "}
+            {this.formatDate(note.modifiedAt)}
+          </InlineMenuItem>
+        </div>
 
         <NoteTextInput
+          className="mousetrap"
           value={this.state.text}
           onChange={this.handleTextChange}
           placeholder="(Empty Note)"
         />
-        <Button
-          iconClassName="ion-md-save"
-          text="Save (Ctrl + S)"
-          onButtonClick={this.handleSave}
-        />
+        {this.state.hasChangedSinceSave && (
+          <Button
+            iconClassName="ion-md-save"
+            text="Save Changes (Ctrl + S)"
+            onButtonClick={this.handleSave}
+          />
+        )}
       </StyledNoteEditView>
     );
   }

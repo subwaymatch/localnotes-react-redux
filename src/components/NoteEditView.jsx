@@ -62,9 +62,13 @@ class NoteEditView extends Component {
     this.handleSave = this.handleSave.bind(this);
   }
 
-  static getDerivedStateFromProps(props, state) {
-    console.log("getDerivedStateFromProps");
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log("shouldComponentUpdate");
 
+    return true;
+  }
+
+  static getDerivedStateFromProps(props, state) {
     let returnVal = null;
 
     if (props.note === null) {
@@ -99,13 +103,20 @@ class NoteEditView extends Component {
   }
 
   handleSave(e) {
-    console.log("handleSave");
+    const currentNote = this.props.note;
 
-    this.props.dispatchUpdateNote(
-      this.state.id,
-      this.state.title,
-      this.state.text
-    );
+    if (
+      this.state.title !== currentNote.title ||
+      this.state.text !== currentNote.text
+    ) {
+      this.props.dispatchUpdateNote(
+        this.state.id,
+        this.state.title,
+        this.state.text
+      );
+
+      this.forceUpdate();
+    }
   }
 
   formatDate(d) {

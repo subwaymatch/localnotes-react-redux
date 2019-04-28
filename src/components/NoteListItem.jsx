@@ -2,16 +2,18 @@ import React, { Component } from "react";
 import styled from "styled-components";
 
 const Title = styled.h3`
-  color: black;
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 8px;
+
+  color: ${props => (props.isActive ? "#097cff" : "#444")};
 `;
 
 const Snippet = styled.p`
-  color: #ddd;
   font-size: 14px;
   line-height: 1.6;
+
+  color: ${props => (props.isActive ? "#aaa" : "#ddd")};
 `;
 
 const StyledNoteListItem = styled.div`
@@ -20,25 +22,37 @@ const StyledNoteListItem = styled.div`
   cursor: pointer;
 
   &:hover ${Snippet} {
-    color: #aaa;
+    color: ${props => (props.isActive ? "#777" : "#aaa")};
   }
 `;
 
 class NoteListItem extends Component {
   getTitle() {
-    return this.props.title;
+    const { title } = this.props;
+
+    return title === ""
+      ? "(Empty Title)"
+      : title.length <= 30
+      ? title
+      : title.substring(0, 28) + "..";
   }
 
   getSnippet() {
-    return this.props.text;
+    const { text } = this.props;
+
+    return text === ""
+      ? "(Empty Note)"
+      : text.length <= 60
+      ? text
+      : text.substring(0, 58) + "..";
   }
 
   render() {
-    const { title, handleClick } = this.props;
+    const { isActive, handleItemClick } = this.props;
     return (
-      <StyledNoteListItem onClick={this.props.handleItemClick}>
-        <Title>{this.getTitle()}</Title>
-        <Snippet>{this.getSnippet()}</Snippet>
+      <StyledNoteListItem isActive={isActive} onClick={handleItemClick}>
+        <Title isActive={isActive}>{this.getTitle()}</Title>
+        <Snippet isActive={isActive}>{this.getSnippet()}</Snippet>
       </StyledNoteListItem>
     );
   }

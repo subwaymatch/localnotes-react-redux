@@ -1,11 +1,10 @@
+const uuidv4 = require("uuid/v4");
+
 export const CREATE_NOTE = "CREATE_NOTE";
 
-export const createNote = (title, text) => ({
+export const createNote = id => ({
   type: CREATE_NOTE,
-  payload: {
-    title,
-    text
-  }
+  payload: id
 });
 
 export const DELETE_NOTE = "DELETE_NOTE";
@@ -32,3 +31,14 @@ export const setCurrentNote = note => ({
   type: SET_CURRENT_NOTE,
   payload: note
 });
+
+export function createNewNoteAndSelect() {
+  return (dispatch, getState) => {
+    const newUUID = uuidv4();
+
+    dispatch(createNote(newUUID));
+
+    const newNote = getState().notes.find(n => n.id === newUUID);
+    dispatch(setCurrentNote(newNote));
+  };
+}

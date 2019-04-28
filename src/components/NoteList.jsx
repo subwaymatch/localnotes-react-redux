@@ -11,13 +11,14 @@ const StyledNoteList = styled.div`
 
 class NoteList extends Component {
   render() {
-    const { notes, dispatchNewCurrentNote } = this.props;
+    const { notes, currentNote, dispatchNewCurrentNote } = this.props;
     return (
       <StyledNoteList>
         {notes.map((note, idx) => {
           return (
             <NoteListItem
               key={idx}
+              isActive={currentNote ? note.id === currentNote.id : false}
               title={note.title}
               text={note.text}
               handleItemClick={dispatchNewCurrentNote(note)}
@@ -30,6 +31,7 @@ class NoteList extends Component {
 }
 
 const mapStateToProps = state => ({
+  currentNote: state.currentNote,
   notes: state.notes
 });
 

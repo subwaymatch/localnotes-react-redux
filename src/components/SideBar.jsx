@@ -1,5 +1,7 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import styled from "styled-components";
+import { createNewNoteAndSelect } from "../actions";
 
 import Button from "./Button";
 import NoteList from "./NoteList";
@@ -17,11 +19,24 @@ class SideBar extends Component {
   render() {
     return (
       <StyledSidebar>
-        <Button iconClassName="ion-md-add" text="New Note" />
+        <Button
+          iconClassName="ion-md-add"
+          text="New Note"
+          onButtonClick={this.props.dispatchCreateNote}
+        />
         <NoteList />
       </StyledSidebar>
     );
   }
 }
 
-export default SideBar;
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+  dispatchCreateNote: () => dispatch(createNewNoteAndSelect())
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SideBar);

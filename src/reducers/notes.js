@@ -1,19 +1,17 @@
 import { CREATE_NOTE, DELETE_NOTE, UPDATE_NOTE } from "../actions";
 
-let newId = 0;
-
 const initialState = [
   {
-    id: newId++,
+    id: "a5793e49-5bf2-4ef3-a518-bdab2aadac35",
     title: "A default note",
     text:
       "This is the default note. Some Lorem Ipsum text should be placed here",
-    createdAt: new Date(Date.now()),
-    modifiedAt: new Date(Date.now())
+    createdAt: new Date(Date.now() - 200000),
+    modifiedAt: new Date(Date.now() - 100000)
   },
   {
-    id: newId++,
-    title: "Aonther note",
+    id: "055ca611-7efc-4f78-b0fa-5d73b2ab12db",
+    title: "Another note",
     text:
       "getDerivedStateFromProps exists for only one purpose. It enables a component to update its internal state as the result of changes in props. Our previous blog post provided some examples, like recording the current scroll direction based on a changing offset prop or loading external data specified by a source prop.",
     createdAt: new Date(Date.now()),
@@ -22,16 +20,14 @@ const initialState = [
 ];
 
 function notes(state = initialState, action) {
-  console.log("notes reducer");
-  console.log(action);
   switch (action.type) {
     case CREATE_NOTE:
       return [
         ...state,
         {
-          id: newId++,
-          title: action.payload.title,
-          text: action.payload.text,
+          id: action.payload,
+          title: "",
+          text: "",
           createdAt: new Date(Date.now()),
           modifiedAt: new Date(Date.now())
         }

@@ -1,10 +1,25 @@
 import { CREATE_NOTE, DELETE_NOTE, UPDATE_NOTE } from "../actions";
 import notesData from "../data/notes-demo-data";
 
-function notes(state = notesData, action) {
+function loadNotes() {
+  let loadedNotes = localStorage.getItem("notes");
+  if (loadedNotes === null) {
+    return notesData;
+  } else {
+    return JSON.parse(loadedNotes);
+  }
+}
+
+function saveNotes(notes) {
+  localStorage.setItem("notes", JSON.stringify(notes));
+}
+
+function notes(state = loadNotes(), action) {
+  let modifiedNotes;
+
   switch (action.type) {
     case CREATE_NOTE:
-      return [
+      modifiedNotes = [
         ...state,
         {
           id: action.payload,
@@ -14,8 +29,12 @@ function notes(state = notesData, action) {
           modifiedAt: new Date(Date.now())
         }
       ];
+
+      saveNotes(modifiedNotes);
+
+      return modifiedNotes;
     case UPDATE_NOTE:
-      return state.map(item => {
+      modifiedNotes = state.map(item => {
         if (item.id === action.payload.id) {
           item.title = action.payload.title;
           item.text = action.payload.text;
@@ -24,8 +43,16 @@ function notes(state = notesData, action) {
 
         return item;
       });
+
+      saveNotes(modifiedNotes);
+
+      return modifiedNotes;
     case DELETE_NOTE:
-      return state.filter(item => item.id !== action.payload);
+      modifiedNotes = state.filter(item => item.id !== action.payload);
+
+      saveNotes(modifiedNotes);
+
+      return modifiedNotes;
     default:
       return state;
   }
